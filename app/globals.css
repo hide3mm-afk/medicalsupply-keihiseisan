@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+/* ← このブロックを編集するとサイト全体のカラーが変わります */
+@theme {
+  --color-primary: #003087;        /* ダークネイビー：ヘッダー・見出し */
+  --color-primary-mid: #0055b3;    /* ミッドブルー：ボタン・リンク */
+  --color-primary-light: #0099cc;  /* アクセントブルー：アイコン・下線 */
+  --color-pale: #e8f4fd;           /* ペールブルー：セクション背景 */
+
+  /* 日本語 + 欧文フォントスタック */
+  --font-sans: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic",
+    "Meiryo", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1a2e;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
