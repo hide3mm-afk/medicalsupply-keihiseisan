@@ -1,5 +1,6 @@
 const DRAFT_KEY = 'expense-app:draft:v1';
 const PERSONS_KEY = 'expense-app:persons:v1';
+const ACCOUNTS_KEY = 'expense-app:accounts:v1';
 
 export function loadDraft() {
   try {
@@ -26,9 +27,9 @@ export function clearDraft() {
   }
 }
 
-export function loadPersons(defaults) {
+function loadList(key, defaults) {
   try {
-    const raw = localStorage.getItem(PERSONS_KEY);
+    const raw = localStorage.getItem(key);
     const saved = raw ? JSON.parse(raw) : null;
     if (!Array.isArray(saved) || saved.length === 0) return defaults;
     // merge in case defaults were extended later, keep saved order first
@@ -42,10 +43,26 @@ export function loadPersons(defaults) {
   }
 }
 
-export function savePersons(persons) {
+function saveList(key, list) {
   try {
-    localStorage.setItem(PERSONS_KEY, JSON.stringify(persons));
+    localStorage.setItem(key, JSON.stringify(list));
   } catch {
     // ignore
   }
+}
+
+export function loadPersons(defaults) {
+  return loadList(PERSONS_KEY, defaults);
+}
+
+export function savePersons(persons) {
+  saveList(PERSONS_KEY, persons);
+}
+
+export function loadAccounts(defaults) {
+  return loadList(ACCOUNTS_KEY, defaults);
+}
+
+export function saveAccounts(accounts) {
+  saveList(ACCOUNTS_KEY, accounts);
 }

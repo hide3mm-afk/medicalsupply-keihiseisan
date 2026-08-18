@@ -93,3 +93,57 @@ export async function downloadExpenseWorkbook(args) {
   XLSX.writeFile(wb, filename);
   return filename;
 }
+
+// Key used to detect duplicate rows when merging imports (e.g. re-importing
+// the same file, or importing data that overlaps with what's already here).
+export function itemKey(item) {
+  return [item.date, item.account, item.detail, item.store, item.price, item.comment, item.person].join('|');
+}
+
+// Reads an .xlsx previously produced by buildExpenseWorkbook (same 8-column
+// layout) so entries made on a different device can be merged in here. Reads
+// cells as formatted text (not raw Date/number values) to sidestep timezone
+// ambiguity in date-serial round-tripping — we parse back the exact
+// "yyyy/m/d" and "#,##0" text this app itself wrote.
+export async function parseExpenseWorkbook(arrayBuffer) {
+  const XLSX = await import('xlsx');
+  const wb = XLSX.read(arrayBuffer, { type: 'array' });
+  const sheetName = wb.SheetNames[0];
+  const ws = wb.Sheets[sheetName];
+  const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
+
+  const nameCell = ws.G1;
+  const detectedName = nameCell ? String(nameCell.v ?? nameCell.w ?? '').trim() : '';
+  const detectedYearMonth = /^\d{6}$/.test(sheetName) ? sheetName : '';
+
+  const items = [];
+  // row 0 = title, row 1 = headers, data starts at row 2 (0-indexed)
+  for (let i = 2; i < rows.length; i++) {
+    const row = rows[i] || [];
+    const store = String(row[4] ?? '').trim();
+    if (store === '合計') break; // reached the totals row
+
+    const dateText = String(row[1] ?? '').trim();
+    if (!/^\d{1,4}\/\d{1,2}\/\d{1,2}$/.test(dateText)) continue; // skip blank/malformed rows
+    const [y, m, d] = dateText.split('/').map((n) => n.padStart(2, '0'));
+
+    const account = String(row[2] ?? '').trim();
+    const person = String(row[7] ?? '').trim();
+    if (!account || !person) continue;
+
+    const priceText = String(row[5] ?? '').replace(/,/g, '').trim();
+
+    items.push({
+      id: crypto.randomUUID(),
+      date: `${y}-${m}-${d}`,
+      account,
+      detail: String(row[3] ?? '').trim(),
+      store,
+      price: Number(priceText) || 0,
+      comment: String(row[6] ?? '').trim(),
+      person,
+    });
+  }
+
+  return { items, detectedName, detectedYearMonth };
+}

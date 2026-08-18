@@ -1,4 +1,4 @@
-export const ACCOUNTS = [
+export const DEFAULT_ACCOUNTS = [
   '接待交際費',
   '旅費交通費',
   '消耗品費',

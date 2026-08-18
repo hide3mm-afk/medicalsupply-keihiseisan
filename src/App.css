@@ -184,6 +184,33 @@ button {
   flex-shrink: 0;
 }
 
+.account-select-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.account-select-row select {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-icon-edit {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: #e8edf6;
+  color: var(--color-primary-dark);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.btn-icon-edit:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 /* Expense list */
 
 .list-header {
@@ -197,6 +224,18 @@ button {
 
 .list-header h2 {
   margin: 0;
+}
+
+.list-header-left {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.list-header-left .btn-small {
+  padding: 6px 10px;
+  font-size: 12px;
 }
 
 .total {

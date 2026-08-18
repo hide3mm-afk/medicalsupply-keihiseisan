@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ACCOUNTS } from '../constants.js';
+import AccountSelect from './AccountSelect.jsx';
 import PersonSelect from './PersonSelect.jsx';
 
 function pad2(n) {
@@ -23,7 +23,15 @@ function emptyForm(defaultPerson) {
   };
 }
 
-export default function ExpenseForm({ defaultPerson, persons, onAddPerson, onSubmit }) {
+export default function ExpenseForm({
+  defaultPerson,
+  persons,
+  onAddPerson,
+  accounts,
+  onAddAccount,
+  onRenameAccount,
+  onSubmit,
+}) {
   const [form, setForm] = useState(() => emptyForm(defaultPerson));
   const [errors, setErrors] = useState({});
   const prevDefaultPerson = useRef(defaultPerson);
@@ -98,16 +106,15 @@ export default function ExpenseForm({ defaultPerson, persons, onAddPerson, onSub
         <label htmlFor="f-account">
           項目 <span className="required">*</span>
         </label>
-        <select id="f-account" value={form.account} onChange={(e) => set('account', e.target.value)} required>
-          <option value="" disabled>
-            選択してください
-          </option>
-          {ACCOUNTS.map((a) => (
-            <option key={a} value={a}>
-              {a}
-            </option>
-          ))}
-        </select>
+        <AccountSelect
+          id="f-account"
+          value={form.account}
+          onChange={(v) => set('account', v)}
+          accounts={accounts}
+          onAddAccount={onAddAccount}
+          onRenameAccount={onRenameAccount}
+          required
+        />
         {errors.account && <p className="error">{errors.account}</p>}
       </div>
 

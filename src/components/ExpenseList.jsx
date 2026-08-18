@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { ACCOUNTS } from '../constants.js';
 import { sortItemsByDate } from '../exportExcel.js';
+import AccountSelect from './AccountSelect.jsx';
 import PersonSelect from './PersonSelect.jsx';
 
 function formatDate(dateStr) {
@@ -9,7 +9,7 @@ function formatDate(dateStr) {
   return `${y}/${Number(m)}/${Number(d)}`;
 }
 
-function EditRow({ item, persons, onAddPerson, onSave, onCancel }) {
+function EditRow({ item, persons, onAddPerson, accounts, onAddAccount, onRenameAccount, onSave, onCancel }) {
   const [form, setForm] = useState({ ...item, price: String(item.price) });
   const [error, setError] = useState('');
 
@@ -48,13 +48,13 @@ function EditRow({ item, persons, onAddPerson, onSave, onCancel }) {
         </label>
         <label>
           項目
-          <select value={form.account} onChange={(e) => set('account', e.target.value)}>
-            {ACCOUNTS.map((a) => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
-          </select>
+          <AccountSelect
+            value={form.account}
+            onChange={(v) => set('account', v)}
+            accounts={accounts}
+            onAddAccount={onAddAccount}
+            onRenameAccount={onRenameAccount}
+          />
         </label>
         <label>
           詳細
@@ -102,7 +102,17 @@ function EditRow({ item, persons, onAddPerson, onSave, onCancel }) {
   );
 }
 
-export default function ExpenseList({ items, persons, onAddPerson, onUpdate, onDelete }) {
+export default function ExpenseList({
+  items,
+  persons,
+  onAddPerson,
+  accounts,
+  onAddAccount,
+  onRenameAccount,
+  onUpdate,
+  onDelete,
+  onImportClick,
+}) {
   const [editingId, setEditingId] = useState(null);
   const sorted = sortItemsByDate(items);
   const total = items.reduce((sum, i) => sum + (Number(i.price) || 0), 0);
@@ -110,7 +120,12 @@ export default function ExpenseList({ items, persons, onAddPerson, onUpdate, onD
   return (
     <section className="card expense-list">
       <div className="list-header">
-        <h2>明細一覧（{items.length}件）</h2>
+        <div className="list-header-left">
+          <h2>明細一覧（{items.length}件）</h2>
+          <button type="button" className="btn-small btn-secondary" onClick={onImportClick}>
+            他端末から取り込み
+          </button>
+        </div>
         <div className="total">
           合計 <span className="total-amount">¥{total.toLocaleString()}</span>
         </div>
@@ -127,6 +142,9 @@ export default function ExpenseList({ items, persons, onAddPerson, onUpdate, onD
                 item={item}
                 persons={persons}
                 onAddPerson={onAddPerson}
+                accounts={accounts}
+                onAddAccount={onAddAccount}
+                onRenameAccount={onRenameAccount}
                 onSave={(patch) => {
                   onUpdate(item.id, patch);
                   setEditingId(null);
