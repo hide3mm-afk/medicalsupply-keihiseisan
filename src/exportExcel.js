@@ -9,11 +9,15 @@ export function todayYYYYMMDD() {
   return `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}`;
 }
 
-// Parses a "yyyy-mm-dd" string (from <input type="date">) into a local Date
-// at midnight, avoiding the UTC-parse day-shift that `new Date(str)` causes.
-function parseLocalDate(dateStr) {
+// Parses a "yyyy-mm-dd" string (from <input type="date">) into a Date at UTC
+// midnight. ExcelJS converts Date -> Excel serial via d.getTime() (the
+// absolute UTC timestamp), not via local calendar fields, so a *local*
+// midnight Date (e.g. `new Date(y, m-1, d)`) gets written as the *previous*
+// day in any timezone ahead of UTC (like JST) once opened in real Excel.
+// Anchoring to UTC midnight keeps the written serial timezone-independent.
+function dateStrToExcelDate(dateStr) {
   const [y, m, d] = dateStr.split('-').map(Number);
-  return new Date(y, m - 1, d);
+  return new Date(Date.UTC(y, m - 1, d));
 }
 
 export function sortItemsByDate(items) {
@@ -96,7 +100,7 @@ export async function buildExpenseWorkbook({ name, yearMonth, items }) {
     };
 
     setCell(1, idx + 1, { align: 'center' });
-    setCell(2, parseLocalDate(item.date), { numFmt: 'yyyy/m/d' });
+    setCell(2, dateStrToExcelDate(item.date), { numFmt: 'yyyy/m/d' });
     setCell(3, item.account);
     setCell(4, item.detail);
     setCell(5, item.store);
@@ -162,7 +166,10 @@ export async function parseExpenseWorkbook(arrayBuffer) {
 
     const dateVal = row.getCell(2).value;
     if (!(dateVal instanceof Date)) continue; // skip blank/malformed rows
-    const date = `${dateVal.getFullYear()}-${pad2(dateVal.getMonth() + 1)}-${pad2(dateVal.getDate())}`;
+    // Excel serial -> Date reconstruction is UTC-anchored (see
+    // dateStrToExcelDate above), so read the calendar date back via UTC
+    // getters, not local ones.
+    const date = `${dateVal.getUTCFullYear()}-${pad2(dateVal.getUTCMonth() + 1)}-${pad2(dateVal.getUTCDate())}`;
 
     const account = String(row.getCell(3).value ?? '').trim();
     const person = String(row.getCell(8).value ?? '').trim();
