@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import ServiceSection from "@/components/services/ServiceSection";
 import ProductCard from "@/components/services/ProductCard";
 import { servicesPageContent } from "@/lib/content/services";
@@ -114,12 +115,13 @@ export default function ServicesPage() {
               </li>
             ))}
           </ul>
-          {/* 画像プレースホルダー — public/images/products/opus.jpg を配置すると表示されます */}
-          <div className="flex h-64 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-mid text-center">
-            <div className="text-white">
-              <p className="text-2xl font-bold">OPUS</p>
-              <p className="mt-1 text-sm text-blue-200">超音波シミュレータ</p>
-            </div>
+          <div className="relative h-64 overflow-hidden rounded-xl lg:h-80">
+            <Image
+              src="/images/opus.png"
+              alt="Volutracer O.P.U.S. 360 WH 超音波シミュレータ"
+              fill
+              className="object-contain"
+            />
           </div>
         </div>
       </ServiceSection>
