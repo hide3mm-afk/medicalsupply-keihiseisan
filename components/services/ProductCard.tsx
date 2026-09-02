@@ -16,7 +16,6 @@ export default function ProductCard({ name, subtitle, description, image }: Prod
           alt={name}
           fill
           className="object-cover"
-          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
         />
         <div className="absolute inset-0 flex items-center justify-center bg-primary/40">
           <div className="text-center">
