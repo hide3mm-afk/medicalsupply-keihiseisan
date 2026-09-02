@@ -35,12 +35,12 @@ export const servicesPageContent = {
         image: "/images/products/vscan.jpg",
       },
       {
-        id: "logiq-vet",
-        name: "LOGIQ（動物病院向け）",
-        subtitle: "獣医療向け",
+        id: "versana",
+        name: "VERSANA",
+        subtitle: "プライマリケア向け",
         description:
           "動物病院・ペットクリニック・動物園・水族館での導入実績多数。獣医療の現場もサポートします。",
-        image: "/images/products/logiq-vet.jpg",
+        image: "/images/products/versana.jpg",
       },
     ],
   },
